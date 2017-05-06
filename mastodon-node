@@ -1,0 +1,28 @@
+#!/bin/sh
+
+. /etc/rc.subr
+
+name="mastodon-node"
+start_cmd="${name}_start"
+stop_cmd="${name}_stop"
+pidfile="/var/run/${name}.pid"
+PATH=${PATH}":/usr/local/bin"
+logfile="/var/log/${name}.log"
+
+MASTODON_HOME="/home/mastodon/live"
+mastodon-node_start()
+{
+	cd ${MASTODON_HOME}
+	NODE_ENV=production npm run start 2>&1 ${logfile}  &
+	echo $! > ${pidfile}
+	echo "${name} start."
+}
+
+mastodon-node_stop()
+{
+	cd ${MASTODON_HOME}
+	NODE_ENV=production npm run stop 
+	echo "${name} stop."
+}
+
+run_rc_command $1

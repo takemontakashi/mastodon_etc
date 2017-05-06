@@ -1,0 +1,60 @@
+#!/bin/sh
+#
+# PROVIDE: mastodon-sidekiq
+# REQUIRE: LOGIN NETWORKING
+# KEYWORD: SHUTDOWN
+#
+# Add the following lines to /etc/rc.conf to enable the mastodon web server
+#
+# mastodon_sidekiq_enable="YES"
+# mastodon_sidekiq_logfile="<path to logfile>"
+# mastodon_sidekiq_pidfile="<path to pidfile>"
+# mastodon_sidekiq_home="<path to mastodon_home>"
+
+
+. /etc/rc.subr
+PATH=${PATH}":/usr/local/bin"
+
+name="mastodon-sidekiq"
+
+rcvar=mastodon_sidekiq_enable
+
+load_rc_config ${name}
+
+
+start_cmd="${name}_start"
+stop_cmd="${name}_stop"
+reload_cmd="${name}_reload"
+
+: ${mastodon_sidekiq_enable="NO"}
+: ${mastodon_sidekiq_pidfile="/var/run/${name}.pid"}
+: ${mastodon_sidekiq_logfile="/var/log/${name}.log"}
+: ${mastodon_sidekiq_home="/home/mastodon/live"}
+
+
+extra_commands="reload"
+
+mastodon-sidekiq_start()
+{
+	cd ${mastodon_sidekiq_home}
+	RAILS_ENV=production /home/mastodon/.rbenv/shims/bundle exec sidekiq -c 5 -q default -q mailers -q pull -q push -d -L ${mastodon_sidekiq_logfile} --pidfile ${mastodon_sidekiq_pidfile}
+	echo "${name} start."
+}
+
+mastodon-sidekiq_stop()
+{
+	kill -USR1 `cat ${mastodon_sidekiq_pidfile}`
+	echo "${name} stopping..."
+	sleep 5
+	kill -TERM `cat ${mastodon_sidekiq_pidfile}`
+	echo "${name} stop."
+}
+
+mastodon-sidekiq_reload()
+{
+	mastodon-sidekiq_stop()
+	nastodon-sidekiq_start()
+	echo "${name} reload."
+}
+
+run_rc_command $1

@@ -1,0 +1,56 @@
+#!/bin/sh
+#
+# PROVIDE: mastodon-web
+# REQUIRE: LOGIN NETWORKING
+# KEYWORD: SHUTDOWN
+#
+# Add the following lines to /etc/rc.conf to enable the mastodon web server
+#
+# mastodon_web_enable="YES"
+# mastodon_web_logfile="<path to logfile>"
+# mastodon_web_pidfile="<path to pidfile>"
+# mastodon_web_home="<path to mastodon_home>"
+
+
+. /etc/rc.subr
+PATH=${PATH}":/usr/local/bin"
+
+name="mastodon-web"
+
+rcvar=mastodon_web_enable
+
+load_rc_config ${name}
+
+
+start_cmd="${name}_start"
+stop_cmd="${name}_stop"
+reload_cmd="${name}_reload"
+
+: ${mastodon_web_enable="NO"}
+: ${mastodon_web_pidfile="/var/run/${name}.pid"}
+: ${mastodon_web_logfile="/var/log/${name}.log"}
+: ${mastodon_web_home="/home/mastodon/live"}
+
+
+extra_commands="reload"
+
+mastodon-web_start()
+{
+	cd ${mastodon_web_home}
+	RAILS_ENV=production /home/mastodon/.rbenv/shims/bundle exec puma -C config/puma.rb -d  --pidfile ${mastodon_web_pidfile}
+	echo "${name} start."
+}
+
+mastodon-web_stop()
+{
+	kill -QUIT `cat ${mastodon_web_pidfile}`
+	echo "${name} stop."
+}
+
+mastodon-web_reload()
+{
+	kill -SIGUSR2 `cat ${mastodon_web_pidfile}`
+	echo "${name} reload."
+}
+
+run_rc_command $1
