@@ -3,18 +3,25 @@
 . /etc/rc.subr
 
 name="mastodon-node"
+rcvar=mastodon_node_enable
+
+load_rc_config ${name}
+
 start_cmd="${name}_start"
 stop_cmd="${name}_stop"
 pidfile="/var/run/${name}.pid"
 PATH=${PATH}":/usr/local/bin"
 logfile="/var/log/${name}.log"
 
-MASTODON_HOME="/home/mastodon/live"
+: ${mastodon_node_user="mastodon"}
+: ${mastodon_node_home="/home/mastodon/live"}
+
+
 mastodon-node_start()
 {
-	cd ${MASTODON_HOME}
-	NODE_ENV=production npm run start 2>&1 ${logfile}  &
-	echo $! > ${pidfile}
+	touch ${pidfile} && chmod ag+wr ${pidfile}
+	touch ${logfile} && chmod ag+wr ${logfile}
+	su - ${mastodon_node_user} -c "cd ${mastodon_node_home} && env NODE_ENV=production npm run start 2>&1 ${logfile}  &"
 	echo "${name} start."
 }
 

@@ -30,14 +30,15 @@ reload_cmd="${name}_reload"
 : ${mastodon_sidekiq_pidfile="/var/run/${name}.pid"}
 : ${mastodon_sidekiq_logfile="/var/log/${name}.log"}
 : ${mastodon_sidekiq_home="/home/mastodon/live"}
-
+: ${mastodon_sidekiq_user="mastodon"}
 
 extra_commands="reload"
 
 mastodon-sidekiq_start()
 {
-	cd ${mastodon_sidekiq_home}
-	RAILS_ENV=production /home/mastodon/.rbenv/shims/bundle exec sidekiq -c 5 -q default -q mailers -q pull -q push -d -L ${mastodon_sidekiq_logfile} --pidfile ${mastodon_sidekiq_pidfile}
+	touch ${mastodon_sidekiq_logfile} && chmod ag+rw ${mastodon_sidekiq_logfile}
+	touch ${mastodon_sidekiq_pidfile} && chmod ag+rw ${mastodon_sidekiq_pidfile}
+	su - ${mastodon_sidekiq_user} -c "cd ${mastodon_sidekiq_home} && env RAILS_ENV=production /home/mastodon/.rbenv/shims/bundle exec sidekiq -c 5 -q default -q mailers -q pull -q push -d -L ${mastodon_sidekiq_logfile} --pidfile ${mastodon_sidekiq_pidfile}"
 	echo "${name} start."
 }
 
