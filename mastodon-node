@@ -21,7 +21,7 @@ mastodon-node_start()
 {
 	touch ${pidfile} && chmod ag+wr ${pidfile}
 	touch ${logfile} && chmod ag+wr ${logfile}
-	su - ${mastodon_node_user} -c "cd ${mastodon_node_home} && env NODE_ENV=production npm run start 2>&1 ${logfile}  &"
+	su - ${mastodon_node_user} -c "cd ${mastodon_node_home} && env NODE_ENV=production npm run start > ${logfile} 2>&1  &"
 	echo "${name} start."
 }
 
