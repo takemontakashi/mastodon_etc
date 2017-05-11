@@ -43,7 +43,7 @@ mastodon-web_start()
 
 mastodon-web_stop()
 {
-	kill -QUIT `cat ${mastodon_web_pidfile}`
+	kill -QUIT `cat ${mastodon_web_pidfile}` || kill -kill `cat ${mastodon_web_pidfile}`
 	echo "${name} stop."
 }
 
