@@ -22,15 +22,13 @@ mastodon-node_start()
 	touch ${pidfile} && chmod ag+wr ${pidfile}
 	touch ${logfile} && chmod ag+wr ${logfile}
 	su - ${mastodon_node_user} -c "cd ${mastodon_node_home} && env NODE_ENV=production npm run start > ${logfile} 2>&1  &"
-	sleep 5
-	echo "slept"
-	ps ax -U ${mastodon_node_user} | grep "_babel_node " | head -n 1 | awk '{print $1;}' | tee ${pidfile}
 	echo "${name} start."
 }
 
 mastodon-node_stop()
 {
 	cd ${MASTODON_HOME}
+	ps ax -U ${mastodon_node_user} | grep "_babel_node " | head -n 1 | awk '{print $1;}' | tee ${pidfile}
 	kill `cat ${pidfile}`
 	echo "${name} stop."
 }
