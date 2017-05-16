@@ -37,7 +37,8 @@ extra_commands="reload"
 mastodon-web_start()
 {
 	touch ${mastodon_web_pidfile} && chmod ag+rw ${mastodon_web_pidfile}
-	su - ${mastodon_web_user} -c "cd ${mastodon_web_home} && env RAILS_ENV=production /home/mastodon/.rbenv/shims/bundle exec puma -C config/puma.rb -d --pidfile ${mastodon_web_pidfile} "
+	touch ${mastodon_web_logfile} && chmod ag+rw ${mastodon_web_logfile}
+	su - ${mastodon_web_user} -c "cd ${mastodon_web_home} && env RAILS_ENV=production /home/mastodon/.rbenv/shims/bundle exec puma -C config/puma.rb --pidfile ${mastodon_web_pidfile} > ${mastodon_web_logfile} 2>&1 & "
 	echo "${name} start."
 }
 

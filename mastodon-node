@@ -1,4 +1,9 @@
 #!/bin/sh
+#
+# PROVIDE: mastodon-node
+# REQUIRE: LOGIN NETWORKING
+# KEYWORD: SHUTDOWN
+
 
 . /etc/rc.subr
 
